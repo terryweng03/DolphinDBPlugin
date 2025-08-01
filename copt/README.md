@@ -1,4 +1,24 @@
 # DolphinDB COPT 插件使用说明
+杉数求解器COPT（Cardinal Optimizer）是杉数自主研发的针对大规模优化问题的高效数学规划求解器套件，杉数求解器目前支持求解线性规划(LP)问题、二阶锥规划(SOCP)问题、二次规划（QP）问题、 二次约束规划（QCP）问题、指数锥规划(ExpCone) 问题、半定规划（SDP）问题、非线性规划(General NLP) 问题、 混合整数线性规划（MILP）、混合整数二阶锥规划（MISOCP）、混合整数凸二次规划(MIQP)、混合整数凸二次约束规划（MIQCP）问题，为企业应对高性能求解的需求提供了更多选择。用户可于官网进行COPT的[试用申请](https://shanshu.ai/copt)。
+## 在插件市场安装插件
+
+### 安装步骤
+
+(1) 在 DolphinDB 客户端中使用 listRemotePlugins 命令查看插件仓库中的插件信息。
+```DolphinDB
+login("admin", "123456")
+listRemotePlugins(, "http://plugins.dolphindb.cn/plugins/")
+```
+
+(2) 使用 installPlugin 命令完成插件安装。
+```DolphinDB
+installPlugin("copt")
+```
+
+(3) 使用 loadPlugin 命令加载插件。
+```DolphinDB
+loadPlugin("copt")
+```
 
 ## 函数接口
 
@@ -453,5 +473,86 @@ copt::solve(model)
 ```dolphindb
 copt::getResult(model)
 ```
+
+### getObjValue
+
+**语法**
+
+`getObjValue(model)`
+
+**详情**
+
+获取优化后的目标值。
+
+**参数**
+
+- model：通过 `model` 接口创建的 COPT 模型对象。
+
+**返回值**
+
+获取优化模型求解后的目标函数值，类型为 DOUBLE。
+
+**示例**
+
+```dolphindb
+copt::getObjValue(model)
+```
+
 ## 使用示例
+``` bash
+/// 初始化模型
+model = copt::model()
+
+/// 增加变量
+lb = 0 0 0 0 0 0 0 0 0 0
+ub = 1 1 1 1 1 1 1 1 1 1
+
+stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
+
+/// 增加线性约束
+A = [1 1 1 0 0 0 0 0 0 0,
+     0 0 0 1 1 1 0 0 0 0,
+     0 0 0 0 0 0 1 1 1 1,
+     -1 -1 -1 0 0 0 0 0 0 0,
+     0 0 0 -1 -1 -1 0 0 0 0,
+     0 0 0 0 0 0 -1 -1 -1 -1]
+rhs = 0.38 0.48 0.38 -0.22 -0.32 -0.22
+
+for (i in 0:6) {
+	lhsExpr = copt::linExpr(model, A[i], stock_vars)
+	copt::addConstr(model, lhsExpr, '<', rhs[i])
+}
+
+lhsExpr = copt::linExpr(model, 1 1 1 1 1 1 1 1 1 1, stock_vars)
+copt::addConstr(model, lhsExpr, '=', 1)
+
+/// 设定优化目标为二次表达式
+coefficients = 0.1 0.02 0.01 0.05 0.17 0.01 0.07 0.08 0.09 0.10
+linExpr = copt::linExpr(model, coefficients, stock_vars)
+
+H = [-1 0 0 0 0 0 0 0 0 0,
+     0 -1 0 0 0 0 0 0 0 0,
+     0 0 -1 0 0 0 0 0 0 0,
+     0 0 0 -1 0 0 0 0 0 0,
+     0 0 0 0 -1 0 0 0 0 0,
+     0 0 0 0 0 -1 0 0 0 0,
+     0 0 0 0 0 0 -1 0 0 0,
+     0 0 0 0 0 0 0 -1 0 0,
+     0 0 0 0 0 0 0 0 -1 0,
+     0 0 0 0 0 0 0 0 0 -1]
+quadExpr = copt::quadExpr(model, matrix(H), stock_vars, linExpr)
+
+copt::setObjective(model, quadExpr, -1)
+
+/// 优化
+status = copt::solve(model)
+
+// 目标函数值
+objValue = copt::getObjValue(model)
+print(objValue)
+
+// 变量取值
+results = copt::getResult(model)
+print(results)
+```
 
