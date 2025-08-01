@@ -462,7 +462,7 @@ copt::solve(model)
 
 **参数**
 
-- model：通过 `model` 接口创建的 Gurobi 模型对象。
+- model：通过 `model` 接口创建的 COPT 模型对象。
 
 **返回值**
 
