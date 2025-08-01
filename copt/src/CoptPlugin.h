@@ -34,6 +34,7 @@ extern "C" {
     
     ConstantSP coptSolve(Heap *heap, vector<ConstantSP> &args);
     ConstantSP coptGetResult(Heap *heap, vector<ConstantSP> &args);
+    ConstantSP coptGetObjValue(Heap *heap, vector<ConstantSP> &args);
 }
 
 #endif //COPTPLUGIN_H

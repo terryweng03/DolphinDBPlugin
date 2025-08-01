@@ -548,6 +548,23 @@ ConstantSP coptGetResult(Heap *heap, vector<ConstantSP> &args) {
     return result;
 }
 
+ConstantSP coptGetObjValue(Heap *heap, vector<ConstantSP> &args) {
+    auto model = COPT_MODEL_AMP.safeGet(args[0]);
+
+    double objValue;
+    try {
+        if (model->GetIntAttr(COPT_INTATTR_ISMIP)) {
+            objValue = model->GetDblAttr(COPT_CBINFO_BESTOBJ);
+        } else {
+            objValue = model->GetDblAttr(COPT_DBLATTR_LPOBJVAL);
+        }
+    } catch (CoptException &e) {
+        throw RuntimeException(COPT_PREFIX + " Error code = " + std::to_string(e.GetCode()) + "\n" + e.what());
+    }
+
+    return new Double(objValue);
+}
+
 
 /// Helper Implementations
 VectorSP getNumVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
