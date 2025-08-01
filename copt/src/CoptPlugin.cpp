@@ -8,6 +8,27 @@
 
 #include "ddbplugin/Plugin.h"
 
+using ddb::DF_DICTIONARY;
+using ddb::DF_MATRIX;
+using ddb::DF_SCALAR;
+using ddb::DF_VECTOR;
+using ddb::DictionarySP;
+using ddb::Double;
+using ddb::DT_ANY;
+using ddb::DT_CHAR;
+using ddb::DT_DOUBLE;
+using ddb::DT_INT;
+using ddb::DT_STRING;
+using ddb::FunctionDefSP;
+using ddb::IllegalArgumentException;
+using ddb::Int;
+using ddb::RuntimeException;
+using ddb::SmartPointer;
+using ddb::Util;
+using ddb::VectorSP;
+using ddb::Void;
+using ddb::String;
+
 using namespace std;
 
 // descriptions
@@ -17,9 +38,9 @@ const string COPT_LINEAR_EXPRESSION_DESC = "copt linear expression";
 const string COPT_QUAD_EXPRESSION_DESC = "copt quadratic expression";
 
 // maps
-dolphindb::ResourceMap<Model> COPT_MODEL_AMP(COPT_PREFIX, COPT_MODEL_DESC);
-dolphindb::ResourceMap<Expr> COPT_LINEAR_EXPRESSION_AMP(COPT_PREFIX, COPT_LINEAR_EXPRESSION_DESC);
-dolphindb::ResourceMap<QuadExpr> COPT_QUAD_EXPRESSION_AMP(COPT_PREFIX, COPT_QUAD_EXPRESSION_DESC);
+ddb::ResourceMap<Model> COPT_MODEL_AMP(COPT_PREFIX, COPT_MODEL_DESC);
+ddb::ResourceMap<Expr> COPT_LINEAR_EXPRESSION_AMP(COPT_PREFIX, COPT_LINEAR_EXPRESSION_DESC);
+ddb::ResourceMap<QuadExpr> COPT_QUAD_EXPRESSION_AMP(COPT_PREFIX, COPT_QUAD_EXPRESSION_DESC);
 
 // close functions
 void modelOnClose(Heap *heap, vector<ConstantSP> &args) {}
@@ -28,18 +49,18 @@ void quadExpressionOnClose(Heap *heap, vector<ConstantSP> &args) {}
 
 
 /// Helper Declarations
-VectorSP getNumVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getNumVector(const ConstantSP &arg, const string &funcName, const string &usage,
                       const string &argName, int size = 0);
-VectorSP getCharVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getCharVector(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName, int size = 0);
-VectorSP getStringVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getStringVector(const ConstantSP &arg, const string &funcName, const string &usage,
                          const string &argName, int size = 0);
-VectorSP getQuadMatrix(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getQuadMatrix(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName, int size = 0);
-int getIntScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName);
-char getCharScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName);
-double getDoubleScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName);
-string getStringScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName);
+int getIntScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+char getCharScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+double getDoubleScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+string getStringScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
 
 
 ConstantSP coptModel(Heap *heap) {
@@ -567,7 +588,7 @@ ConstantSP coptGetObjValue(Heap *heap, vector<ConstantSP> &args) {
 
 
 /// Helper Implementations
-VectorSP getNumVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getNumVector(const ConstantSP &arg, const string &funcName, const string &usage,
                       const string &argName, int size) {
     if (arg.isNull() or arg->getForm() != DF_VECTOR or (arg->getType() != DT_INT and arg->getType() != DT_DOUBLE)) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a vector of int or double.");
@@ -581,7 +602,7 @@ VectorSP getNumVector(const SmartPointer<Constant> &arg, const string &funcName,
     return arg;
 }
 
-VectorSP getCharVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getCharVector(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName, int size) {
     if (arg.isNull() or arg->getForm() != DF_VECTOR or arg->getType() != DT_CHAR) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a vector of char.");
@@ -595,7 +616,7 @@ VectorSP getCharVector(const SmartPointer<Constant> &arg, const string &funcName
     return arg;
 }
 
-VectorSP getStringVector(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getStringVector(const ConstantSP &arg, const string &funcName, const string &usage,
                          const string &argName, int size) {
     if (arg.isNull() or arg->getForm() != DF_VECTOR or arg->getType() != DT_STRING) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a vector of string.");
@@ -609,7 +630,7 @@ VectorSP getStringVector(const SmartPointer<Constant> &arg, const string &funcNa
     return arg;
 }
 
-VectorSP getQuadMatrix(const SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+VectorSP getQuadMatrix(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName, int size) {
     // check form
     auto form = arg->getForm();
@@ -632,21 +653,21 @@ VectorSP getQuadMatrix(const SmartPointer<Constant> &arg, const string &funcName
     return arg;
 }
 
-int getIntScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName) {
+int getIntScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
     if (arg.isNull() or arg->getForm() != DF_SCALAR or arg->getType() != DT_INT) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a int.");
     }
     return arg->getInt();
 }
 
-char getCharScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName) {
+char getCharScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
     if (arg.isNull() or arg->getForm() != DF_SCALAR or arg->getType() != DT_CHAR) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a char.");
     }
     return arg->getChar();
 }
 
-double getDoubleScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage,
+double getDoubleScalar(ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName) {
     if (arg.isNull() or arg->getForm() != DF_SCALAR or (arg->getType() != DT_DOUBLE and arg->getType() != DT_INT)) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a double.");
@@ -654,7 +675,7 @@ double getDoubleScalar(SmartPointer<Constant> &arg, const string &funcName, cons
     return arg->getDouble();
 }
 
-string getStringScalar(SmartPointer<Constant> &arg, const string &funcName, const string &usage, const string &argName) {
+string getStringScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
     if (arg.isNull() or arg->getForm() != DF_SCALAR or arg->getType() != DT_STRING) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a string.");
     }

@@ -9,6 +9,10 @@
 #include "coptcpp_pch.h"
 #include "ddbplugin/CommonInterface.h"
 
+using ddb::ConstantSP;
+using ddb::Heap;
+using std::vector;
+
 extern "C" {
     ConstantSP coptModel(Heap *heap);
     ConstantSP coptModelRead(Heap *heap, vector<ConstantSP> &args);
