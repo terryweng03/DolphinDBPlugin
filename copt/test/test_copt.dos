@@ -1,0 +1,137 @@
+login("admin","123456")
+try{loadPlugin("/mnt/d/DolphinDBPlugin/copt/PluginCopt.txt")}catch(ex){print(ex)}
+
+@testing:case="test_get_and_set_model_parameters"
+
+model = copt::model()
+oldLpMethod = copt::modelGetIntParam(model, 'lpmethod')
+copt::modelSetIntParam(model, 'lpmethod', 1)
+newLpMethod = copt::modelGetIntParam(model, 'lpmethod')
+
+assert 1, oldLpMethod == -1
+assert 2, newLpMethod == 1
+
+oldTimeLimit = copt::modelGetDblParam(model, 'TimeLimit')
+copt::modelSetDblParam(model, 'TimeLimit', 3500.5)
+newTimeLimit = copt::modelGetDblParam(model, 'TimeLimit')
+
+assert 3, newTimeLimit == 3500.5
+
+
+@testing:case="test_add_vars_and_vars_attr"
+
+model = copt::model()
+
+lb = 0 0 0 0 0 0 0 0 0 0
+ub = 1 1 1 1 1 1 1 1 1 1
+obj = 1 2 1 1 1 1 1 1 1 1
+
+continues_vars = copt::addVars(model, 3, , , , )
+
+assert 1, continues_vars[0] == 'C_0'
+assert 2, copt::varsGetAttr(model, continues_vars[0], 'LB') == 0
+assert 3, copt::varsGetAttr(model, continues_vars[0:2], 'OBJ') == [0,0]
+
+copt::varsSetAttr(model, continues_vars[0], 'UB', 1.5)
+copt::varsSetAttr(model, continues_vars[0:2], 'OBJ', [1.2, 3])
+
+assert 4, copt::varsGetAttr(model, continues_vars[0], 'UB') == 1.5
+assert 5, copt::varsGetAttr(model, continues_vars[0:2], 'OBJ') == [1.2, 3]
+
+model_2 = copt::model()
+stock_vars = copt::addVars(model_2, 10, lb, ub, obj, , 'stock')
+assert 6, stock_vars[1] == 'stock_1'
+assert 7, copt::varsGetAttr(model_2, stock_vars[0], 'UB') == 1
+assert 8, copt::varsGetAttr(model_2, stock_vars[1], 'OBJ') == 2
+
+model_3 = copt::model()
+type = 'B' 'B'
+binary_vars = copt::addVars(model_3, 2, , , , type)
+assert 9, copt::varsGetAttr(model_3, binary_vars[0], 'UB') == 1
+
+
+@testing:case="test_varsSetAttr_the_size_of_varNames_and_varValues_are_different", exception=1
+
+model = copt::model()
+continues_vars = copt::addVars(model, 3, , , , )
+
+copt::varsSetAttr(model, continues_vars[0], 'UB', [1.5, 2])
+
+
+@testing:case="test_varsSetAttr_the_size_of_varNames_and_varValues_are_different_2", exception=1
+
+model = copt::model()
+continues_vars = copt::addVars(model, 3, , , , )
+
+copt::varsSetAttr(model, continues_vars[0:2], 'UB', 1.5)
+
+
+@testing:case="test_get_model_attr_and_obj_value_and_results"
+
+model = copt::model()
+old_var_num = copt::modelGetIntAttr(model, 'Cols')
+
+lb = 0 0 0 0 0 0 0 0 0 0
+ub = 1 1 1 1 1 1 1 1 1 1
+
+stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
+new_var_num = copt::modelGetIntAttr(model, 'Cols')
+
+assert 1, old_var_num == 0
+assert 2, new_var_num == 10
+
+A = [1 1 1 0 0 0 0 0 0 0,
+     0 0 0 1 1 1 0 0 0 0,
+     0 0 0 0 0 0 1 1 1 1,
+     -1 -1 -1 0 0 0 0 0 0 0,
+     0 0 0 -1 -1 -1 0 0 0 0,
+     0 0 0 0 0 0 -1 -1 -1 -1]
+rhs = 0.38 0.48 0.38 -0.22 -0.32 -0.22
+
+for (i in 0:6) {
+	lhsExpr = copt::linExpr(model, A[i], stock_vars)
+	copt::addConstr(model, lhsExpr, '<', rhs[i])
+}
+
+lhsExpr = copt::linExpr(model, 1 1 1 1 1 1 1 1 1 1, stock_vars)
+copt::addConstr(model, lhsExpr, '=', 1)
+
+coefficients = 0.1 0.02 0.01 0.05 0.17 0.01 0.07 0.08 0.09 0.10
+linExpr = copt::linExpr(model, coefficients, stock_vars)
+
+H = [-1 0 0 0 0 0 0 0 0 0,
+     0 -1 0 0 0 0 0 0 0 0,
+     0 0 -1 0 0 0 0 0 0 0,
+     0 0 0 -1 0 0 0 0 0 0,
+     0 0 0 0 -1 0 0 0 0 0,
+     0 0 0 0 0 -1 0 0 0 0,
+     0 0 0 0 0 0 -1 0 0 0,
+     0 0 0 0 0 0 0 -1 0 0,
+     0 0 0 0 0 0 0 0 -1 0,
+     0 0 0 0 0 0 0 0 0 -1]
+quadExpr = copt::quadExpr(model, matrix(H), stock_vars, linExpr)
+
+copt::setObjective(model, quadExpr, -1)
+
+status = copt::solve(model)
+
+obj_value = copt::getObjValue(model)
+obj_value_2 = copt::modelGetDblAttr(model, 'LpObjval')
+
+assert 3, round(obj_value, 4) == -0.0254
+assert 4, round(obj_value_2, 4) == -0.0254
+
+results = copt::getResult(model)
+
+assert 5, round(results['stock_0'], 4) == 0.1233
+assert 6, round(results['stock_1'], 4) == 0.0833
+assert 7, round(results['stock_2'], 4) == 0.0783
+assert 8, round(results['stock_3'], 4) == 0.0983
+assert 9, round(results['stock_4'], 4) == 0.1583
+assert 10, round(results['stock_5'], 4) == 0.0783
+assert 11, round(results['stock_6'], 4) == 0.0875
+assert 12, round(results['stock_7'], 4) == 0.0925
+assert 13, round(results['stock_8'], 4) == 0.0975
+assert 14, round(results['stock_9'], 4) == 0.1025
+
+
