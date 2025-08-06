@@ -185,7 +185,7 @@ copt::modelGetDblParam(model, 'TimeLimit') # 获取优化求解的时间限制�
 - model：通过 `model` 接口创建的 COPT 模型对象。
 - intParamName：类型为 STRING, 整数参数名称。
 - intParamValue：类型为 INT, 整数参数的值。
-- 
+-
 **示例**
 
 ```dolphindb
@@ -257,12 +257,14 @@ varNames = copt::addVars(model, 4, , , , , "vars1") # varNames = ["vars1_0","var
 **参数**
 
 - model：通过 `model` 接口创建的 COPT 模型对象。
-- varNames：STRING 类型数组, 对应 *model* 模型中的变量。
+- varNames：STRING 类型数组 或者 STRING 类型, 对应 *model* 模型中的变量。
 - attrName：类型为 STRING, 获取的信息名称。
 
 **返回值**
 
-返回 DOUBLE 类型数组，数组中的每个双精度浮点数为对应变量的信息值。
+当 varNames 为 STRING 类型数组，返回 DOUBLE 类型数组，数组中的每个双精度浮点数为对应变量的信息值。
+
+当 varNames 为 STRING 类型，返回 DOUBLE 类型，为对应变量的信息值。
 
 **示例**
 
@@ -281,9 +283,10 @@ UBVec = copt::varsGetAttr(model, varNames, "UB") # 获取 varNames 的上界
 **参数**
 
 - model：通过 `model` 接口创建的 COPT 模型对象。
-- varNames：STRING 类型数组, 对应 *model* 模型中的变量。
+- varNames：STRING 类型数组 或者 STRING 类型, 对应 *model* 模型中的变量。
 - attrName：类型为 STRING, 获取的信息名称。
-- attrValues: Double 类型数组, 对应变量的信息值
+- attrValues: Double 类型数组 或者 DOUBLE 类型, 对应变量的信息值  
+  注：varNames 长度需要和 attrValues 长度一致
 
 **示例**
 
