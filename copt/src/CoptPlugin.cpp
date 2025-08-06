@@ -281,31 +281,66 @@ ConstantSP coptVarsGetAttr(Heap *heap, vector<ConstantSP> &args) {
     string usage = COPT_PREFIX + " varsGetAttr(model, varNames, attrName): ";
 
     auto model = COPT_MODEL_AMP.safeGet(args[0]);
-    auto varNames = getStringVector(args[1], __FUNCTION__, usage, "varNames", args[1]->size());
+
+    bool singleVar = true;
+    if (args[1]->getForm() == DF_VECTOR)
+        singleVar = false;
+
     auto varAttrName = getStringScalar(args[2], __FUNCTION__, usage, "varAttrName");
 
     // get attribute values of given vars
-    VectorSP attrValue = Util::createVector(DT_DOUBLE, 0); 
-    try {
-       for (auto i = 0; i < varNames->size(); ++i) {
-            auto var = model->GetVarByName(varNames->getString(i).c_str());
-            attrValue->append(new Double(var.Get(varAttrName.c_str())));
+    if (singleVar) {
+        auto varName = getStringScalar(args[1], __FUNCTION__, usage, "varName");
+        double attrValue;
+        try {
+            auto var = model->GetVarByName(varName.c_str());
+            attrValue = var.Get(varAttrName.c_str());
+            return new Double(attrValue);
+        } catch (CoptException &e) {
+            throw RuntimeException(COPT_PREFIX + " Error code = " + std::to_string(e.GetCode()) + "\n" + e.what());
+        }
+    } else {
+        auto varNames = getStringVector(args[1], __FUNCTION__, usage, "varNames", args[1]->size());
+        VectorSP attrValue = Util::createVector(DT_DOUBLE, 0);
+        try {
+           for (auto i = 0; i < varNames->size(); ++i) {
+                auto var = model->GetVarByName(varNames->getString(i).c_str());
+                attrValue->append(new Double(var.Get(varAttrName.c_str())));
+            }
+            return attrValue;
+        } catch (CoptException &e) {
+            throw RuntimeException(COPT_PREFIX + " Error code = " + std::to_string(e.GetCode()) + "\n" + e.what());
+        }
     }
-    } catch (CoptException &e) {
-        throw RuntimeException(COPT_PREFIX + " Error code = " + std::to_string(e.GetCode()) + "\n" + e.what());
-    } 
-
-    return attrValue;
 }
 
 ConstantSP coptVarsSetAttr(Heap *heap, vector<ConstantSP> &args) {
     string usage = COPT_PREFIX + " varsSetAttr(model, varNames, attrName, attrValues): ";
 
-    auto numVars = args[1]->size();
     auto model = COPT_MODEL_AMP.safeGet(args[0]);
-    auto varNames = getStringVector(args[1], __FUNCTION__, usage, "varNames", numVars);
+
+    VectorSP varNames;
+    if (args[1]->getForm() == DF_VECTOR) {
+        varNames = getStringVector(args[1], __FUNCTION__, usage, "varNames",  args[1]->size());
+    } else {
+        auto varName = getStringScalar(args[1], __FUNCTION__, usage, "varName");
+        varNames = Util::createVector(DT_STRING, 0);
+        varNames->append(new String(varName));
+    }
+
     auto attrName = getStringScalar(args[2], __FUNCTION__, usage, "attrName");
-    auto attrValues = getNumVector(args[3], __FUNCTION__, usage, "attrValues", numVars);;
+
+    VectorSP attrValues;
+    if (args[3]->getForm() == DF_VECTOR) {
+        attrValues = getNumVector(args[3], __FUNCTION__, usage, "attrValues",  args[3]->size());
+    } else {
+        auto attrValue = getDoubleScalar(args[3], __FUNCTION__, usage, "attrValue");
+        attrValues = Util::createVector(DT_DOUBLE, 0);
+        attrValues->append(new Double(attrValue));
+    }   
+
+    if (varNames->size() != attrValues->size())
+        throw IllegalArgumentException(__FUNCTION__, usage + "size of varNames should equals to should the size of attrValues.");
 
     // set attribute values of given vars
     try {
