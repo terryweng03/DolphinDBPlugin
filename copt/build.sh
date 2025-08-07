@@ -1,7 +1,7 @@
 rm -rf build
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_CXX_COMPILER=gcc
 make -j
 cd ..
 mkdir -p $CMAKE_INSTALL_PREFIX/$(basename $(pwd))
