@@ -1,5 +1,5 @@
 # DolphinDB COPT 插件使用说明
-杉数求解器COPT（Cardinal Optimizer）是杉数自主研发的针对大规模优化问题的高效数学规划求解器套件，杉数求解器目前支持求解线性规划(LP)问题、二阶锥规划(SOCP)问题、二次规划（QP）问题、 二次约束规划（QCP）问题、指数锥规划(ExpCone) 问题、半定规划（SDP）问题、非线性规划(General NLP) 问题、 混合整数线性规划（MILP）、混合整数二阶锥规划（MISOCP）、混合整数凸二次规划(MIQP)、混合整数凸二次约束规划（MIQCP）问题，为企业应对高性能求解的需求提供了更多选择。用户可于官网进行COPT的[试用申请](https://shanshu.ai/copt)。
+杉数求解器COPT（Cardinal Optimizer）是杉数自主研发的针对大规模优化问题的高效数学规划求解器套件，杉数求解器目前支持求解线性规划（LP）问题、二阶锥规划（SOCP）问题、二次规划（QP）问题、 二次约束规划（QCP）问题、指数锥规划（ExpCone）问题、半定规划（SDP）问题、非线性规划（General NLP）问题、 混合整数线性规划（MILP）、混合整数二阶锥规划（MISOCP）、混合整数凸二次规划（MIQP）、混合整数凸二次约束规划（MIQCP）问题，为企业应对高性能求解的需求提供了更多选择。用户可于官网进行COPT的[试用申请](https://shanshu.ai/copt)。
 ## 在插件市场安装插件
 
 ### 安装步骤
@@ -86,7 +86,7 @@ copt::modelWrite(model, "lp_ex1.sol") # 将求解结果写入 lp_ex1.sol 文件�
 
 **详情**
 
-获取 COPT 整型属性的值，请参考 COPT 文档的 [属性](https://guide.coap.online/copt/zh-doc/attribute.html)。
+获取 COPT模型 整型属性的值，请参考 COPT 文档的 [属性](https://guide.coap.online/copt/zh-doc/attribute.html)。
 
 **参数**
 
@@ -109,7 +109,7 @@ copt::modelGetIntAttr(model, "Cols") # 获取模型的变量个数
 
 **详情**
 
-获取 COPT 双精度型属性的值，请参考 COPT 文档的 [属性](https://guide.coap.online/copt/zh-doc/attribute.html)。
+获取 COPT模型 双精度型属性的值，请参考 COPT 文档的 [属性](https://guide.coap.online/copt/zh-doc/attribute.html)。
 
 **参数**
 
@@ -132,7 +132,7 @@ copt::modelGetDblAttr(model, 'BestObj') # 获取整数规划求解结束时最�
 
 **详情**
 
-获取 COPT 整型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
+获取 COPT模型 整型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
 
 **参数**
 
@@ -155,7 +155,7 @@ copt::modelGetIntParam(model, 'logging') # 获取代表是否显示求解日志�
 
 **详情**
 
-获取COPT双精度型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
+获取 COPT模型 双精度型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
 
 **参数**
 
@@ -178,7 +178,7 @@ copt::modelGetDblParam(model, 'TimeLimit') # 获取优化求解的时间限制�
 
 **详情**
 
-设置 COPT 整型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
+设置 COPT模型 整型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
 
 **参数**
 
@@ -198,7 +198,7 @@ copt::modelSetIntParam(model, 'logging', 0) # 设置为不显示求解日志
 
 **详情**
 
-设置 COPT 双精度型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
+设置 COPT模型  双精度型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
 
 **参数**
 
@@ -243,7 +243,7 @@ copt::modelSetDblParam(model, 'TimeLimit', 1800.0) # 将求解时间限制设置
 
 ```dolphindb
 varNames = copt::addVars(model, 10, , , , , ) # 设置一组数量为10的连续变量 (lb = 0, ub = inf, obj = 0)
-varNames = copt::addVars(model, 4, , , , , "vars1") # varNames = ["vars1_0","vars1_1","vars1_2","vars1_3"]
+varNames = copt::addVars(model, 4, , , , , "vars1") # varNames = ["vars1_10","vars1_11","vars1_12","vars1_13"]
 ```
 
 ### varsGetAttr
@@ -262,8 +262,7 @@ varNames = copt::addVars(model, 4, , , , , "vars1") # varNames = ["vars1_0","var
 
 **返回值**
 
-当 varNames 为 STRING 类型数组，返回 DOUBLE 类型数组，数组中的每个双精度浮点数为对应变量的信息值。
-
+当 varNames 为 STRING 类型数组，返回 DOUBLE 类型数组，数组中的每个双精度浮点数为对应变量的信息值。  
 当 varNames 为 STRING 类型，返回 DOUBLE 类型，为对应变量的信息值。
 
 **示例**
