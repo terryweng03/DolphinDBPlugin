@@ -5,7 +5,7 @@
 ## 在插件市场安装插件
 
 ### 版本要求
-DolphinDB Server: 2.00.16及更高版本，或3.00.3及更高版本
+DolphinDB Server: 2.00.16及更高版本，或3.00.3及更高版本。
 
 注：目前仅支持 x86 的 Linux 版本。
 
@@ -39,15 +39,15 @@ loadPlugin("copt")
 
 建立一个 COPT 模型对象。
 
+**返回值**
+
+返回创建的 COPT 模型对象。
+
 **示例**
 
 ```dolphindb
 model = copt::model()
 ```
-
-**返回值**
-
-返回创建的 COPT 模型对象。
 
 ### modelRead
 
@@ -61,6 +61,10 @@ model = copt::model()
 
 - model：通过 `model` 接口创建的 COPT 模型对象。
 - filePath：类型为 STRING，文件路径。
+
+**返回值**
+
+该函数无返回值。
 
 **示例**
 
@@ -215,15 +219,15 @@ copt::modelSetIntParam(model, 'logging', 0) // 设置为不显示求解日志
 
 设置 COPT模型  双精度型参数的值，请参考 COPT 文档的 [参数](https://guide.coap.online/copt/zh-doc/parameter.html)。
 
-**返回值**
-
-该函数无返回值。
-
 **参数**
 
 - model：通过 `model` 接口创建的 COPT 模型对象。
 - dblParamName：类型为 STRING，双精度型参数名称。
 - dblParamValue：类型为 DOUBLE，双精度型参数的值。
+
+**返回值**
+
+该函数无返回值。
 
 **示例**
 
