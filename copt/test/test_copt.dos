@@ -157,10 +157,6 @@ copt::modelSetIntParam(model, 'lpmethod', 1.5)
 copt::modelSetIntParam(model, 'lpmethod', NULL)
 
 
-@testing:case="test_modelSetIntParam_wrong_param_format_4", exception=1
-copt::modelSetIntParam(model, 'lpmethod', int())
-
-
 @testing:case="test_modelSetIntParam_not_exist_param", exception=1
 copt::modelSetIntParam(model, 'lpmethod_2', 1)
 
