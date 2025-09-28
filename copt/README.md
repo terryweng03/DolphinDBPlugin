@@ -352,7 +352,7 @@ lhsExpr = copt::linExpr(model, 1 2, x, 2)  // 创建线性表达式：x[0] + 2 *
 
 **语法**
 
-`quadExpr(model, quadMatrix, varNames, [linExpr], constant)`
+`quadExpr(model, quadMatrix, varNames, linExpr, constant)`
 
 **详情**
 
