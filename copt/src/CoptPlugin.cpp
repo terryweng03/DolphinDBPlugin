@@ -22,9 +22,18 @@ dolphindb::ResourceMap<Expr> COPT_LINEAR_EXPRESSION_AMP(COPT_PREFIX, COPT_LINEAR
 dolphindb::ResourceMap<QuadExpr> COPT_QUAD_EXPRESSION_AMP(COPT_PREFIX, COPT_QUAD_EXPRESSION_DESC);
 
 // close functions
-void modelOnClose(Heap *heap, vector<ConstantSP> &args) {}
-void linearExpressionOnClose(Heap *heap, vector<ConstantSP> &args) {}
-void quadExpressionOnClose(Heap *heap, vector<ConstantSP> &args) {}
+void modelOnClose(Heap *heap, vector<ConstantSP> &args) {
+	std::ignore = heap;
+    COPT_MODEL_AMP.safeRemoveWithoutException(args[0]);
+}
+void linearExpressionOnClose(Heap *heap, vector<ConstantSP> &args) {
+	std::ignore = heap;
+    COPT_LINEAR_EXPRESSION_AMP.safeRemoveWithoutException(args[0]);
+}
+void quadExpressionOnClose(Heap *heap, vector<ConstantSP> &args) {
+	std::ignore = heap;
+    COPT_QUAD_EXPRESSION_AMP.safeRemoveWithoutException(args[0]);
+}
 
 
 /// Helper Declarations
@@ -525,7 +534,7 @@ ConstantSP coptSetObjective(Heap *heap, vector<ConstantSP> &args) {
     }
     int sense = args[2]->getInt();
     if (sense != COPT_MAXIMIZE && sense != COPT_MINIMIZE) {
-        throw IllegalArgumentException(__FUNCTION__, usage + " sense should be 1 , 0 or -1.");
+        throw IllegalArgumentException(__FUNCTION__, usage + " sense should be 1 or -1.");
     }
 
     bool isQuad = false;
