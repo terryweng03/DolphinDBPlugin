@@ -66,10 +66,10 @@ VectorSP getStringVector(const ConstantSP &arg, const string &funcName, const st
                          const string &argName, int size = 0);
 VectorSP getQuadMatrix(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName, int size = 0);
-int getIntScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
-char getCharScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
-double getDoubleScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
-string getStringScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+int getIntScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+char getCharScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+double getDoubleScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
+string getStringScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName);
 
 
 ConstantSP coptModel(Heap *heap) {
@@ -634,7 +634,7 @@ ConstantSP coptGetObjValue(Heap *heap, vector<ConstantSP> &args) {
 /// Helper Implementations
 VectorSP getNumVector(const ConstantSP &arg, const string &funcName, const string &usage,
                       const string &argName, int size) {
-    if (arg.isNull() or arg->getForm() != DF_VECTOR or (arg->getType() != DT_INT and arg->getType() != DT_DOUBLE)) {
+    if (arg.isNull() or arg == NULL or arg->getForm() != DF_VECTOR or (arg->getType() != DT_INT and arg->getType() != DT_DOUBLE)) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a vector of int or double.");
     }
     if (arg->size() != size) {
@@ -648,7 +648,7 @@ VectorSP getNumVector(const ConstantSP &arg, const string &funcName, const strin
 
 VectorSP getCharVector(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName, int size) {
-    if (arg.isNull() or arg->getForm() != DF_VECTOR or arg->getType() != DT_CHAR) {
+    if (arg.isNull() or arg == NULL or arg->getForm() != DF_VECTOR or arg->getType() != DT_CHAR) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a vector of char.");
     }
     if (arg->size() != size) {
@@ -662,7 +662,7 @@ VectorSP getCharVector(const ConstantSP &arg, const string &funcName, const stri
 
 VectorSP getStringVector(const ConstantSP &arg, const string &funcName, const string &usage,
                          const string &argName, int size) {
-    if (arg.isNull() or arg->getForm() != DF_VECTOR or arg->getType() != DT_STRING) {
+    if (arg.isNull() or arg == NULL or arg->getForm() != DF_VECTOR or arg->getType() != DT_STRING) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a vector of string.");
     }
     if (arg->size() != size) {
@@ -678,7 +678,7 @@ VectorSP getQuadMatrix(const ConstantSP &arg, const string &funcName, const stri
                        const string &argName, int size) {
     // check form
     auto form = arg->getForm();
-    if (arg.isNull() or form != DF_MATRIX) {
+    if (arg.isNull() or arg == NULL or form != DF_MATRIX) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a matrix.");
     }
     // check size
@@ -697,30 +697,30 @@ VectorSP getQuadMatrix(const ConstantSP &arg, const string &funcName, const stri
     return arg;
 }
 
-int getIntScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
-    if (arg.isNull() or arg->getForm() != DF_SCALAR or arg->getType() != DT_INT) {
+int getIntScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
+    if (arg->isNull() or arg == NULL or arg->getForm() != DF_SCALAR or arg->getType() != DT_INT) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a int.");
     }
     return arg->getInt();
 }
 
-char getCharScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
-    if (arg.isNull() or arg->getForm() != DF_SCALAR or arg->getType() != DT_CHAR) {
+char getCharScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
+    if (arg.isNull() or arg == NULL or arg->getForm() != DF_SCALAR or arg->getType() != DT_CHAR) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a char.");
     }
     return arg->getChar();
 }
 
-double getDoubleScalar(ConstantSP &arg, const string &funcName, const string &usage,
+double getDoubleScalar(const ConstantSP &arg, const string &funcName, const string &usage,
                        const string &argName) {
-    if (arg.isNull() or arg->getForm() != DF_SCALAR or (arg->getType() != DT_DOUBLE and arg->getType() != DT_INT)) {
+    if (arg.isNull() or arg == NULL or arg->getForm() != DF_SCALAR or (arg->getType() != DT_DOUBLE and arg->getType() != DT_INT)) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a double.");
     }
     return arg->getDouble();
 }
 
-string getStringScalar(ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
-    if (arg.isNull() or arg->getForm() != DF_SCALAR or arg->getType() != DT_STRING) {
+string getStringScalar(const ConstantSP &arg, const string &funcName, const string &usage, const string &argName) {
+    if (arg.isNull() or arg == NULL or arg->getForm() != DF_SCALAR or arg->getType() != DT_STRING) {
         throw IllegalArgumentException(funcName, usage + argName + " should be a string.");
     }
     return arg->getString();
