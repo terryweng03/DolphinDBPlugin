@@ -31,6 +31,10 @@ copt::modelRead(model, NULL)
 copt::modelRead(model, string(NULL))
 
 
+@testing:case="test_modelRead_wrong_param_format_4", exception=1
+copt::modelRead(model, ["/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mps"])
+
+
 @testing:case="test_modelRead_wrong_file_format", exception=1
 copt::modelRead(model, "/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mds")
 
@@ -45,6 +49,18 @@ copt::modelRead(model)
 
 @testing:case="test_modelRead_wrong_input_num_2", syntaxError=1
 copt::modelRead(model, "/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mps", "error")
+
+
+@testing:case="test_modelRead_wrong_model_input_1", exception=1
+copt::modelRead(1, "/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mps")
+
+
+@testing:case="test_modelRead_wrong_model_input_2", exception=1
+copt::modelRead(NULL, "/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mps")
+
+
+@testing:case="test_modelRead_wrong_model_input_3", exception=1
+copt::modelRead([model], "/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mps")
 
 
 // modelWrite
@@ -71,12 +87,28 @@ copt::modelWrite(model, 111)
 copt::modelWrite(model, NULL)
 
 
+@testing:case="test_modelWrite_wrong_param_format_3", exception=1
+copt::modelWrite(model, ["./tmp.mps"])
+
+
 @testing:case="test_modelWrite_wrong_input_num_1", syntaxError=1
 copt::modelWrite(model)
 
 
 @testing:case="test_modelWrite_wrong_input_num_2", syntaxError=1
 copt::modelWrite(model, "./tmp.mps", "error")
+
+
+@testing:case="test_modelWrite_wrong_model_input_1", exception=1
+copt::modelWrite(1, "./tmp.mps")
+
+
+@testing:case="test_modelWrite_wrong_model_input_2", exception=1
+copt::modelWrite(NULL, "./tmp.mps")
+
+
+@testing:case="test_modelWrite_wrong_model_input_3", exception=1
+copt::modelWrite([model], "./tmp.mps")
 
 
 // modelGetIntAttr
@@ -92,8 +124,24 @@ tmp = copt::modelGetIntAttr(model, NULL)
 tmp = copt::modelGetIntAttr(model, string(NULL))
 
 
+@testing:case="test_modelGetIntAttr_wrong_param_format_4", exception=1
+tmp = copt::modelGetIntAttr(model, ['Cols'])
+
+
 @testing:case="test_modelGetIntAttr_not_exist_param", exception=1
 tmp = copt::modelGetIntAttr(model, 'col')
+
+
+@testing:case="test_modelGetIntAttr_wrong_model_input_1", exception=1
+tmp = copt::modelGetIntAttr(1, 'Cols')
+
+
+@testing:case="test_modelGetIntAttr_wrong_model_input_2", exception=1
+tmp = copt::modelGetIntAttr(NULL, 'Cols')
+
+
+@testing:case="test_modelGetIntAttr_wrong_model_input_3", exception=1
+tmp = copt::modelGetIntAttr([model], 'Cols')
 
 
 // modelGetDblAttr
@@ -105,6 +153,10 @@ tmp = copt::modelGetDblAttr(model, 111)
 tmp = copt::modelGetDblAttr(model, NULL)
 
 
+@testing:case="test_modelGetDblAttr_wrong_param_format_3", exception=1
+tmp = copt::modelGetDblAttr(model, ['LpObjval'])
+
+
 @testing:case="test_modelGetDblAttr_not_exist_param", exception=1
 tmp = copt::modelGetDblAttr(model, 'objs')
 
@@ -113,8 +165,20 @@ tmp = copt::modelGetDblAttr(model, 'objs')
 tmp = copt::modelGetDblAttr('col')
 
 
-@testing:case="test_modelGetDblAtt_wrong_input_num_2", syntaxError=1
+@testing:case="test_modelGetDblAttr_wrong_input_num_2", syntaxError=1
 tmp = copt::modelGetDblAttr(model, 'col', "error")
+
+
+@testing:case="test_modelGetDblAttr_wrong_model_input_1", exception=1
+tmp = copt::modelGetDblAttr(1, 'LpObjval')
+
+
+@testing:case="test_modelGetDblAttr_wrong_model_input_2", exception=1
+tmp = copt::modelGetDblAttr(NULL, 'LpObjval')
+
+
+@testing:case="test_modelGetDblAttr_wrong_model_input_3", exception=1
+tmp = copt::modelGetDblAttr([model], 'LpObjval')
 
 
 // modelGetIntParam
@@ -125,8 +189,12 @@ oldLpMethod = copt::modelGetIntParam(model, 'lpmethod')
 assert 1, oldLpMethod == -1
 
 
-@testing:case="test_modelGetIntParam_wrong_param_format", exception=1
+@testing:case="test_modelGetIntParam_wrong_param_format_1", exception=1
 tmp = copt::modelGetIntParam(model, 111)
+
+
+@testing:case="test_modelGetIntParam_wrong_param_format_2", exception=1
+tmp = copt::modelGetIntParam(model, ['lpmethod'])
 
 
 @testing:case="test_modelGetIntParam_not_exist_param", exception=1
@@ -134,7 +202,19 @@ lpmethod_2 = copt::modelGetIntParam(model, 'lpmethod_2')
 
 
 @testing:case="test_modelGetIntParam_wrong_input_num_1", syntaxError=1
-tmp = copt::modelGetIntParam('lpmethod_2')
+tmp = copt::modelGetIntParam('lpmethod')
+
+
+@testing:case="test_modelGetIntParam_wrong_model_input_1", exception=1
+tmp = copt::modelGetIntParam(1, 'lpmethod')
+
+
+@testing:case="test_modelGetIntParam_wrong_model_input_2", exception=1
+tmp = copt::modelGetIntParam(NULL, 'lpmethod')
+
+
+@testing:case="test_modelGetIntParam_wrong_model_input_3", exception=1
+tmp = copt::modelGetIntParam([model], 'lpmethod')
 
 
 // modelSetIntParam
@@ -157,8 +237,28 @@ copt::modelSetIntParam(model, 'lpmethod', 1.5)
 copt::modelSetIntParam(model, 'lpmethod', NULL)
 
 
+@testing:case="test_modelSetIntParam_wrong_param_format_4", exception=1
+copt::modelSetIntParam(model, ['lpmethod'], 1)
+
+
+@testing:case="test_modelSetIntParam_wrong_param_format_5", exception=1
+copt::modelSetIntParam(model, 'lpmethod', [1])
+
+
 @testing:case="test_modelSetIntParam_not_exist_param", exception=1
 copt::modelSetIntParam(model, 'lpmethod_2', 1)
+
+
+@testing:case="test_modelSetIntParam_wrong_model_input_1", exception=1
+copt::modelSetIntParam(1, 'lpmethod', 1)
+
+
+@testing:case="test_modelSetIntParam_wrong_model_input_2", exception=1
+copt::modelSetIntParam(NULL, 'lpmethod', 1)
+
+
+@testing:case="test_modelSetIntParam_wrong_model_input_3", exception=1
+copt::modelSetIntParam([model], 'lpmethod', 1)
 
 
 // modelGetDblParam & modelSetDblParam
@@ -170,12 +270,28 @@ newTimeLimit = copt::modelGetDblParam(model, 'TimeLimit')
 assert 1, newTimeLimit == 3500.5
 
 
-@testing:case="test_modelGetDblParam_wrong_param_format", exception=1
+@testing:case="test_modelGetDblParam_wrong_param_format_1", exception=1
 tmp = copt::modelGetDblParam(model, 111)
+
+
+@testing:case="test_modelGetDblParam_wrong_param_format_2", exception=1
+tmp = copt::modelGetDblParam(model, ['TimeLimit'])
 
 
 @testing:case="test_modelGetDblParam_not_exist_param", exception=1
 timelimit_2 = copt::modelGetDblParam(model, 'TimeLimit_2')
+
+
+@testing:case="test_modelGetDblParam_wrong_model_input_1", exception=1
+tmp = copt::modelGetDblParam(1, 'TimeLimit')
+
+
+@testing:case="test_modelGetDblParam_wrong_model_input_2", exception=1
+tmp = copt::modelGetDblParam(NULL, 'TimeLimit')
+
+
+@testing:case="test_modelGetDblParam_wrong_model_input_3", exception=1
+tmp = copt::modelGetDblParam([model], 'TimeLimit')
 
 
 @testing:case="test_modelSetDblParam_wrong_param_format_1", exception=1
@@ -190,11 +306,31 @@ copt::modelSetDblParam(model, 'TimeLimit', '10.5')
 copt::modelSetDblParam(model, 'TimeLimit', NULL)
 
 
+@testing:case="test_modelSetDblParam_wrong_param_format_4", exception=1
+copt::modelSetDblParam(model, ['TimeLimit'], 3500.5)
+
+
+@testing:case="test_modelSetDblParam_wrong_param_format_5", exception=1
+copt::modelSetDblParam(model, 'TimeLimit', [3500.5])
+
+
 @testing:case="test_modelSetDblParam_not_exist_param", exception=1
 copt::modelSetDblParam(model, 'TimeLimit_2', 1.5)
 
 
-// AddVars & varsGetAttr
+@testing:case="test_modelSetDblParam_wrong_model_input_1", exception=1
+copt::modelSetDblParam(1, 'TimeLimit', 3500.5)
+
+
+@testing:case="test_modelSetDblParam_wrong_model_input_2", exception=1
+copt::modelSetDblParam(NULL, 'TimeLimit', 3500.5)
+
+
+@testing:case="test_modelSetDblParam_wrong_model_input_3", exception=1
+copt::modelSetDblParam([model], 'TimeLimit', 3500.5)
+
+
+// addVars & varsGetAttr
 @testing:case="test_addVars_and_varsGetAttr"
 
 model = copt::model()
@@ -297,6 +433,34 @@ tmp = copt::addVars(model, 3, ,)
 tmp = copt::addVars(model, 3, , , , , , , ,)
 
 
+@testing:case="test_addVars_empty_vector_1", exception=1
+tmp =  copt::addVars(model, 3, [], , , )
+
+
+@testing:case="test_addVars_empty_vector_2", exception=1
+tmp =  copt::addVars(model, 3, , [], , )
+
+
+@testing:case="test_addVars_empty_vector_3", exception=1
+tmp =  copt::addVars(model, 3, , , [], )
+
+
+@testing:case="test_addVars_empty_vector_4", exception=1
+tmp =  copt::addVars(model, 3, , , , [])
+
+
+@testing:case="test_addVars_wrong_model_input_1", exception=1
+tmp = copt::addVars(1, 3, , , , )
+
+
+@testing:case="test_addVars_wrong_model_input_2", exception=1
+tmp = copt::addVars(NULL, 3, , , , )
+
+
+@testing:case="test_addVars_wrong_model_input_3", exception=1
+tmp = copt::addVars([model], 3, , , , )
+
+
 @testing:case="test_varsGetAttr_wrong_param_format_1", exception=1
 tmp = copt::varsGetAttr(model, 123, 'LB')
 
@@ -313,12 +477,32 @@ tmp = copt::varsGetAttr(model, continues_vars[0], NULL)
 tmp = copt::varsGetAttr(model, continues_vars[0], string(NULL))
 
 
+@testing:case="test_varsGetAttr_wrong_param_format_5", exception=1
+tmp = copt::varsGetAttr(model, continues_vars[0], ['LB'])
+
+
 @testing:case="test_varsGetAttr_var_not_exist", exception=1
 tmp = copt::varsGetAttr(model, 'AAA', 'LB')
 
 
 @testing:case="test_varsGetAttr_attr_not_exist", exception=1
 tmp = copt::varsGetAttr(model, continues_vars[0], 'LB_2')
+
+
+@testing:case="test_varsGetAttr_empty_vector", exception=1
+tmp = copt::varsGetAttr(model, [], 'OBJ')
+
+
+@testing:case="test_varsGetAttr_wrong_model_input_1", exception=1
+tmp = copt::varsGetAttr(1, continues_vars[0], 'LB')
+
+
+@testing:case="test_varsGetAttr_wrong_model_input_2", exception=1
+tmp = copt::varsGetAttr(NULL, continues_vars[0], 'LB')
+
+
+@testing:case="test_varsGetAttr_wrong_model_input_3", exception=1
+tmp = copt::varsGetAttr([model], continues_vars[0], 'LB')
 
 
 // varsSetAttr
@@ -361,6 +545,26 @@ copt::varsSetAttr(model, continues_vars[0:2], 'UB', 1.5)
 copt::varsSetAttr(model, continues_vars[0], 'UB', 1.5 1.5)
 
 
+@testing:case="test_varsSetAttr_empty_vector_1", exception=1
+copt::varsSetAttr(model, [], 'UB', 1.5 1.5)
+
+
+@testing:case="test_varsSetAttr_empty_vector_2", exception=1
+copt::varsSetAttr(model, continues_vars[0:2], 'UB', [])
+
+
+@testing:case="test_varsSetAttr_wrong_model_input_1", exception=1
+copt::varsSetAttr(1, continues_vars[0], 'UB', 1.5)
+
+
+@testing:case="test_varsSetAttr_wrong_model_input_2", exception=1
+copt::varsSetAttr(NULL, continues_vars[0], 'UB', 1.5)
+
+
+@testing:case="test_varsSetAttr_wrong_model_input_3", exception=1
+copt::varsSetAttr([model], continues_vars[0], 'UB', 1.5)
+
+
 // LinExpr
 @testing:case="test_LinExpr"
 model = copt::model()
@@ -383,6 +587,20 @@ tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars, '1')
 
 @testing:case="test_LinExpr_wrong_param_format_4", exception=1
 tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars, -1 0 0 0 0 0 0 0 0 0)
+
+
+@testing:case="test_LinExpr_wrong_param_format_5", exception=1
+tmp = copt::linExpr(model, ['c', 'c', 'c', 'c', 'c', 'c', 'c', 'c', 'c', 'c'], stock_vars)
+
+
+@testing:case="test_LinExpr_wrong_param_format_6", exception=1
+tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+
+
+@testing:case="test_LinExpr_wrong_param_format_7", exception=1
+stock_vars_not_exist = copt::addVars(model, 10, lb, ub, , , 'stock_vars_not_exist')
+stock_vars_not_exist[0] = stock_vars_not_exist[0] + '_test'
+tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars_not_exist)
 
 
 @testing:case="test_LinExpr_wrong_param_format_5", exception=1
@@ -414,6 +632,26 @@ tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0)
 
 @testing:case="test_LinExpr_wrong_input_num_3", syntaxError=1
 tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars, 3, 'error')
+
+
+@testing:case="test_LinExpr_empty_vector_1", exception=1
+tmp = copt::linExpr(model, [], stock_vars)
+
+
+@testing:case="test_LinExpr_empty_vector_2", exception=1
+tmp = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, [])
+
+
+@testing:case="test_LinExpr_wrong_model_input_1", exception=1
+tmp = copt::linExpr(1, -1 0 0 0 0 0 0 0 0 0, stock_vars)
+
+
+@testing:case="test_LinExpr_wrong_model_input_2", exception=1
+tmp = copt::linExpr(NULL, -1 0 0 0 0 0 0 0 0 0, stock_vars)
+
+
+@testing:case="test_LinExpr_wrong_model_input_3", exception=1
+tmp = copt::linExpr([model], -1 0 0 0 0 0 0 0 0 0, stock_vars)
 
 
 // QuadExpr
@@ -454,6 +692,23 @@ tmp = copt::quadExpr(model, matrix(H), stock_vars, , 1 1)
 tmp = copt::quadExpr(model, NULL, stock_vars,)
 
 
+@testing:case="test_quadExpr_wrong_param_format_6", exception=1
+stock_vars_string = copt::addVars(model, 2, , , , , 'stock_vars_string')
+H_string = ['c' 'c',
+            'c' 'c']
+tmp = copt::quadExpr(model, matrix(H_string), stock_vars_string)
+
+
+@testing:case="test_quadExpr_wrong_param_format_7", exception=1
+tmp = copt::quadExpr(model, matrix(H), [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+
+
+@testing:case="test_quadExpr_wrong_param_format_8", exception=1
+stock_vars_not_exist = copt::addVars(model, 10, lb, ub, , , 'stock_vars_not_exist')
+stock_vars_not_exist[0] = stock_vars_not_exist[0] + '_test'
+tmp = copt::quadExpr(model, matrix(H), stock_vars_not_exist)
+
+
 @testing:case="test_quadExpr_quad_matrix_contains_null", exception=1
 H_2 = [-1 0 0 0 0 0 0 0 0 0,
        0 -1 0 0 0 0 0 0 0 0,
@@ -476,7 +731,6 @@ stock_vars_2[1] = NULL
 tmp = copt::quadExpr(model, matrix(H_2), stock_vars_2)
 
 
-
 @testing:case="test_quadExpr_difference_size", exception=1
 tmp = copt::quadExpr(model, matrix(H), stock_vars[0:5])
 
@@ -491,6 +745,26 @@ tmp = copt::quadExpr(model, stock_vars[0:5])
 
 @testing:case="test_quadExpr_wrong_input_num_3", syntaxError=1
 tmp = copt::quadExpr(model, matrix(H), stock_vars[0:5], , 10, 'error')
+
+
+@testing:case="test_quadExpr_empty_vector_1", exception=1
+tmp = copt::quadExpr(model, matrix(H), [])
+
+
+@testing:case="test_quadExpr_empty_matrix_1", exception=1
+tmp = copt::quadExpr(model, [], stock_vars)
+
+
+@testing:case="test_quadExpr_wrong_model_input_1", exception=1
+tmp = copt::quadExpr(1, matrix(H), stock_vars)
+
+
+@testing:case="test_quadExpr_wrong_model_input_2", exception=1
+tmp = copt::quadExpr(NULL, matrix(H), stock_vars)
+
+
+@testing:case="test_quadExpr_wrong_model_input_3", exception=1
+tmp = copt::quadExpr([model], matrix(H), stock_vars)
 
 
 // addConstr
@@ -530,8 +804,24 @@ copt::addConstr(model, lhsExpr, '<', 1, 123)
 copt::addConstr(model, lhsExpr, NULL, 1)
 
 
-@testing:case="test_addConstr_wrong_param_format_7", exception=1
+@testing:case="test_addConstr_wrong_param_format_8", exception=1
 copt::addConstr(model, lhsExpr, '<', NULL)
+
+
+@testing:case="test_addConstr_wrong_param_format_9", exception=1
+copt::addConstr(model, lhsExpr, ['<'], 1)
+
+
+@testing:case="test_addConstr_wrong_param_format_10", exception=1
+copt::addConstr(model, lhsExpr, '<', [1])
+
+
+@testing:case="test_addConstr_wrong_param_format_11", exception=1
+copt::addConstr(model, lhsExpr, '<', ['1'])
+
+
+@testing:case="test_addConstr_wrong_param_format_12", exception=1
+copt::addConstr(model, lhsExpr, '<', 1, ['CON'])
 
 
 @testing:case="test_addConstr_wrong_input_num_1", syntaxError=1
@@ -540,6 +830,18 @@ copt::addConstr(model, lhsExpr, '<')
 
 @testing:case="test_addConstr_wrong_input_num_2", syntaxError=1
 copt::addConstr(model, stock_vars[2], '<', 1, 'const1', 'error')
+
+
+@testing:case="test_addConstr_wrong_model_input_1", exception=1
+copt::addConstr(1, lhsExpr, '<', 1)
+
+
+@testing:case="test_addConstr_wrong_model_input_1", exception=1
+copt::addConstr(NULL, lhsExpr, '<', 1)
+
+
+@testing:case="test_addConstr_wrong_model_input_1", exception=1
+copt::addConstr([model], lhsExpr, '<', 1)
 
 
 // setLogFile, setObjective, solve, getResult, getObjValue
@@ -626,6 +928,18 @@ copt::setLogFile(model, ['./copt_test.log'])
 copt::setLogFile(model, NULL)
 
 
+@testing:case="test_setLogFile_wrong_model_input_1", exception=1
+copt::setLogFile(1, './copt_test.log')
+
+
+@testing:case="test_setLogFile_wrong_model_input_2", exception=1
+copt::setLogFile(NULL, './copt_test.log')
+
+
+@testing:case="test_setLogFile_wrong_model_input_3", exception=1
+copt::setLogFile([model], './copt_test.log')
+
+
 @testing:case="test_setObjective_wrong_param_format_1", exception=1
 copt::setObjective(model, stock_vars, -1)
 
@@ -642,32 +956,72 @@ copt::setObjective(model, quadExpr, NULL)
 copt::setObjective(model, NULL, 1)
 
 
+@testing:case="test_setObjective_wrong_param_format_5", exception=1
+copt::setObjective(model, quadExpr, [-1])
+
+
 @testing:case="test_setObjective_wrong_sense", exception=1
 copt::setObjective(model, quadExpr, 3)
 
 
-@testing:case="test_solve_wrong_param_format_1", exception=1
-copt::solve(stock_vars)
+@testing:case="test_setObjective_wrong_model_input_1", exception=1
+copt::setObjective(1, quadExpr, -1)
 
 
-@testing:case="test_solve_wrong_param_format_2", exception=1
+@testing:case="test_setObjective_wrong_model_input_1", exception=1
+copt::setObjective(NULL, quadExpr, -1)
+
+
+@testing:case="test_setObjective_wrong_model_input_1", exception=1
+copt::setObjective([model], quadExpr, -1)
+
+
+@testing:case="test_solve_wrong_input_num_1", syntaxError=1
+copt::solve(model, 1)
+
+
+@testing:case="test_solve_wrong_model_input_1", exception=1
+copt::solve(1)
+
+
+@testing:case="test_solve_wrong_model_input_2", exception=1
 copt::solve(NULL)
 
 
-@testing:case="test_getResult_wrong_param_format_1", exception=1
-copt::getResult(stock_vars)
+@testing:case="test_solve_wrong_model_input_3", exception=1
+copt::solve([model])
 
 
-@testing:case="test_getResult_wrong_param_format_2", exception=1
+@testing:case="test_getResult_wrong_input_num_1", syntaxError=1
+copt::getResult(model, 1)
+
+
+@testing:case="test_getResult_wrong_model_input_1", exception=1
+copt::getResult(1)
+
+
+@testing:case="test_getResult_wrong_model_input_2", exception=1
 copt::getResult(NULL)
 
 
-@testing:case="test_getObjValue_wrong_param_format_1", exception=1
-copt::getObjValue(111)
+@testing:case="test_getResult_wrong_model_input_3", exception=1
+copt::getResult([model])
 
 
-@testing:case="test_getObjValue_wrong_param_format_2", exception=1
+@testing:case="test_getObjValue_wrong_input_num_1", syntaxError=1
+copt::getObjValue(model, 1)
+
+
+@testing:case="test_getObjValue_wrong_model_input_1", exception=1
+copt::getObjValue(1)
+
+
+@testing:case="test_getObjValue_wrong_model_input_2", exception=1
 copt::getObjValue(NULL)
+
+
+@testing:case="test_getObjValue_wrong_model_input_3", exception=1
+copt::getObjValue([model])
 
 
 @testing:case="test_multi_threads"
