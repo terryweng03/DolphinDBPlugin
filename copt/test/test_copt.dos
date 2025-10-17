@@ -64,7 +64,7 @@ copt::modelRead([model], "/mnt/d/DolphinDBPlugin/copt/test/test_data/MIP_case.mp
 
 
 // modelWrite
-@testing:case="test_modelWrite"
+@testing:case="test_modelWrite_multi_time"
 model = copt::model()
 
 lb = 0 0 0 0 0 0 0 0 0 0
@@ -75,8 +75,20 @@ copt::modelWrite(model, "./tmp.mps")
 model_2 = copt::model()
 copt::modelRead(model_2, "./tmp.mps")
 
-var_num = copt::modelGetIntAttr(model_2, 'Cols')
-assert 1, var_num == 10
+var_num_model_2 = copt::modelGetIntAttr(model_2, 'Cols')
+assert 1, var_num_model_2 == 10
+
+stock_vars_2 = copt::addVars(model_2, 10, lb, ub, , , 'stock_2')
+var_num_model_1 = copt::modelGetIntAttr(model, 'Cols')
+var_num_model_2 = copt::modelGetIntAttr(model_2, 'Cols')
+assert 2, var_num_model_1 == 10
+assert 3, var_num_model_2 == 20
+
+copt::modelWrite(model_2, "./tmp.mps")
+model_3 = copt::model()
+copt::modelRead(model_3, "./tmp.mps")
+var_num_model_3 = copt::modelGetIntAttr(model_3, 'Cols')
+assert 4, var_num_model_3 == 20
 
 
 @testing:case="test_modelWrite_wrong_param_format", exception=1
@@ -218,11 +230,29 @@ tmp = copt::modelGetIntParam([model], 'lpmethod')
 
 
 // modelSetIntParam
-@testing:case="test_modelSetIntParam"
+@testing:case="test_modelGetIntParam_and_modelSetIntParam"
 copt::modelSetIntParam(model, 'lpmethod', 1)
 
 newLpMethod = copt::modelGetIntParam(model, 'lpmethod')
 assert 1, newLpMethod == 1
+
+
+@testing:case="test_modelGetIntParam_and_modelSetIntParam_multi_time"
+copt::modelSetIntParam(model, 'lpmethod', 2)
+lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+assert 1, lpmethod == 2
+
+copt::modelSetIntParam(model, 'lpmethod', 3)
+lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+assert 2, lpmethod == 3
+
+copt::modelSetIntParam(model, 'lpmethod', -1)
+lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+assert 3, lpmethod == -1
+
+copt::modelSetIntParam(model, 'lpmethod', 6)
+lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+assert 4, lpmethod == 6
 
 
 @testing:case="test_modelSetIntParam_wrong_param_format_1", exception=1
@@ -268,6 +298,28 @@ copt::modelSetDblParam(model, 'TimeLimit', 3500.5)
 newTimeLimit = copt::modelGetDblParam(model, 'TimeLimit')
 
 assert 1, newTimeLimit == 3500.5
+
+
+@testing:case="test_modelGetDblParam_and_modelSetDblParam_multi_time"
+copt::modelSetDblParam(model, 'TimeLimit', 1.5)
+timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+assert 1, timelimit == 1.5
+
+copt::modelSetDblParam(model, 'TimeLimit', 33.3)
+timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+assert 2, timelimit == 33.3
+
+copt::modelSetDblParam(model, 'TimeLimit', 50)
+timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+assert 3, timelimit == 50
+
+copt::modelSetDblParam(model, 'TimeLimit', 36000)
+timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+assert 4, timelimit == 36000
+
+copt::modelSetDblParam(model, 'TimeLimit', 2321)
+timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+assert 5, timelimit == 2321
 
 
 @testing:case="test_modelGetDblParam_wrong_param_format_1", exception=1
@@ -361,6 +413,20 @@ model_3 = copt::model()
 type = 'B' 'B'
 binary_vars = copt::addVars(model_3, 2, , , , type)
 assert 9, copt::varsGetAttr(model_3, binary_vars[0], 'UB') == 1
+
+
+@testing:case="test_addVars_diff_types"
+model_diff_type = copt::model()
+
+lb = 0 0 0 0 0 0 0 0 0 0
+ub = 1 1 1 1 1 1 1 1 1 1
+type = 'B' 'C' 'C' 'B' 'B' 'B' 'B' 'B' 'I' 'I'
+
+stock_vars_diff_types = copt::addVars(model_diff_type, 10, lb, ub, , type, 'stock_diff_types')
+
+assert 1, copt::modelGetIntAttr(model_diff_type, 'Cols') == 10
+assert 2, copt::modelGetIntAttr(model_diff_type, 'Ints') == 2
+assert 3, copt::modelGetIntAttr(model_diff_type, 'Bins') == 6
 
 
 @testing:case="test_addVars_wrong_param_format_1", exception=1
@@ -566,11 +632,15 @@ copt::varsSetAttr([model], continues_vars[0], 'UB', 1.5)
 
 
 // LinExpr
-@testing:case="test_LinExpr"
+@testing:case="test_LinExpr_1"
 model = copt::model()
 stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
 
 lhsExpr = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars)
+
+
+@testing:case="test_LinExpr_2"
+lhsExpr_with_constant = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars, 2)
 
 
 @testing:case="test_LinExpr_wrong_param_format_1", exception=1
@@ -655,7 +725,7 @@ tmp = copt::linExpr([model], -1 0 0 0 0 0 0 0 0 0, stock_vars)
 
 
 // QuadExpr
-@testing:case="test_QuadExpr"
+@testing:case="test_QuadExpr_1"
 model = copt::model()
 stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
 H = [-1 0 0 0 0 0 0 0 0 0,
@@ -670,6 +740,10 @@ H = [-1 0 0 0 0 0 0 0 0 0,
      0 0 0 0 0 0 0 0 0 -1]
 
 quadExpr = copt::quadExpr(model, matrix(H), stock_vars)
+
+
+@testing:case="test_QuadExpr_2"
+quadExpr = copt::quadExpr(model, matrix(H), stock_vars, , 2)
 
 
 @testing:case="test_QuadExpr_wrong_param_format_1", exception=1
@@ -768,12 +842,69 @@ tmp = copt::quadExpr([model], matrix(H), stock_vars)
 
 
 // addConstr
-@testing:case="test_addConstr"
+@testing:case="test_addConstr_1"
 model = copt::model()
 stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
 
 lhsExpr = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars)
 copt::addConstr(model, lhsExpr, '<', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 1
+
+
+@testing:case="test_addConstr_2"
+copt::addConstr(model, lhsExpr, '=', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 2
+
+
+@testing:case="test_addConstr_3"
+copt::addConstr(model, lhsExpr, '>', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 3
+
+
+@testing:case="test_addConstr_4"
+copt::addConstr(model, lhsExpr, 'L', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 4
+
+
+@testing:case="test_addConstr_5"
+copt::addConstr(model, lhsExpr, 'E', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 5
+
+
+@testing:case="test_addConstr_6"
+copt::addConstr(model, lhsExpr, 'G', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 6
+
+
+@testing:case="test_addConstr_with_constraint_name"
+copt::addConstr(model, lhsExpr, '<', 1, 'constr_1')
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 7
+
+
+@testing:case="test_addConstr_quad_constr"
+H = [-1 0 0 0 0 0 0 0 0 0,
+     0 -1 0 0 0 0 0 0 0 0,
+     0 0 -1 0 0 0 0 0 0 0,
+     0 0 0 -1 0 0 0 0 0 0,
+     0 0 0 0 -1 0 0 0 0 0,
+     0 0 0 0 0 -1 0 0 0 0,
+     0 0 0 0 0 0 -1 0 0 0,
+     0 0 0 0 0 0 0 -1 0 0,
+     0 0 0 0 0 0 0 0 -1 0,
+     0 0 0 0 0 0 0 0 0 -1]
+
+quadExpr = copt::quadExpr(model, matrix(H), stock_vars)
+copt::addConstr(model, quadExpr, '<', 1)
+
+assert 1, copt::modelGetIntAttr(model, 'Rows') == 7
+assert 2, copt::modelGetIntAttr(model, 'QConstrs') == 1
 
 
 @testing:case="test_addConstr_wrong_param_format_1", exception=1
@@ -915,6 +1046,31 @@ assert 12, round(results['stock_7'], 4) == 0.0925
 assert 13, round(results['stock_8'], 4) == 0.0975
 assert 14, round(results['stock_9'], 4) == 0.1025
 
+copt::setObjective(model, quadExpr, 1)
+status = copt::solve(model)
+obj_value_minimize = copt::getObjValue(model)
+
+assert 15, round(obj_value_minimize, 4) == -0.3456
+
+results_minimize = copt::getResult(model)
+
+assert 16, round(results_minimize['stock_0'], 4) == 0
+assert 17, round(results_minimize['stock_1'], 4) == 0
+assert 18, round(results_minimize['stock_2'], 4) == 0.3
+assert 19, round(results_minimize['stock_3'], 4) == 0
+assert 20, round(results_minimize['stock_4'], 4) == 0
+assert 21, round(results_minimize['stock_5'], 4) == 0.48
+assert 22, round(results_minimize['stock_6'], 4) == 0.22
+assert 23, round(results_minimize['stock_7'], 4) == 0
+assert 24, round(results_minimize['stock_8'], 4) == 0
+assert 25, round(results_minimize['stock_9'], 4) == 0
+
+
+@testing:case="test_setObjective_linExpr_obj"
+assert 1, copt::modelGetIntAttr(model, 'hasQObj') == 1
+copt::setObjective(model, linExpr, 1)
+assert 2, copt::modelGetIntAttr(model, 'hasQObj') == 0
+
 
 @testing:case="test_setLogFile_wrong_param_format_1", exception=1
 copt::setLogFile(model, 234)
@@ -1024,9 +1180,27 @@ copt::getObjValue(NULL)
 copt::getObjValue([model])
 
 
+@testing:case="test_read_model_file_and_solve"
+model = copt::model()
+copt::modelRead(model, "/mnt/d/DolphinDBPlugin/copt/test/test_data/lp_case.mps")
+copt::solve(model)
+
+obj_value = copt::getObjValue(model)
+obj_value_2 = copt::modelGetDblAttr(model, 'LpObjval')
+
+assert 1, round(obj_value, 4) == 3.5783
+assert 2, round(obj_value_2, 4) == 3.5783
+
+results = copt::getResult(model)
+
+assert 3, round(results["x"], 4) == 0.1
+assert 4, round(results["y"], 4) == 1.5
+assert 5, round(results["z"], 4) == 0.3611
+
+
 @testing:case="test_multi_threads"
 def test_copt_process(){
-	for(i in 1..30){
+	for(round in 1..30){
 		model = copt::model()
         lb = 0 0 0 0 0 0 0 0 0 0
         ub = 1 1 1 1 1 1 1 1 1 1
@@ -1082,3 +1256,257 @@ for (jobName in arr){
 
 re = exec errorMsg from getRecentJobs() where jobId in arr
 assert 1, re == take("", 10)
+
+
+@testing:case="test_multi_threads_modelSetIntParam_and_modelSetIntParam_multi_time"
+def test_copt_process(){
+	for(i in 1..30){
+		model = copt::model()
+        copt::modelSetIntParam(model, 'lpmethod', 2)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 1, lpmethod == 2
+
+        copt::modelSetIntParam(model, 'lpmethod', 3)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 2, lpmethod == 3
+
+        copt::modelSetIntParam(model, 'lpmethod', -1)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 3, lpmethod == -1
+
+        copt::modelSetIntParam(model, 'lpmethod', 6)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 4, lpmethod == 6
+	}
+}
+
+arr = array(STRING, 0, 10)
+for(i in 1..10){
+	arr.append!(submitJob("job"+string(i), "", test_copt_process))
+}
+
+for (jobName in arr){
+	getJobReturn(jobName, true)
+}
+
+re = exec errorMsg from getRecentJobs() where jobId in arr
+assert 5, re == take("", 10)
+
+
+@testing:case="test_multi_threads_modelSetIntParam_and_modelSetIntParam_multi_time_one_model"
+model = copt::model()
+
+def test_copt_process(model){
+	for(i in 1..30){
+        copt::modelSetIntParam(model, 'lpmethod', 2)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 1, lpmethod == 2
+
+        copt::modelSetIntParam(model, 'lpmethod', 3)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 2, lpmethod == 3
+
+        copt::modelSetIntParam(model, 'lpmethod', -1)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 3, lpmethod == -1
+
+        copt::modelSetIntParam(model, 'lpmethod', 6)
+        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
+        assert 4, lpmethod == 6
+	}
+}
+
+arr = array(STRING, 0, 10)
+for(i in 1..10){
+	arr.append!(submitJob("job"+string(i), "", test_copt_process, model)
+}
+
+for (jobName in arr){
+	getJobReturn(jobName, true)
+}
+
+re = exec errorMsg from getRecentJobs() where jobId in arr
+assert 5, re == take("", 10)
+
+
+@testing:case="test_multi_threads_modelSetIntParam_and_modelSetIntParam_multi_time"
+def test_copt_process(){
+	for(i in 1..30){
+		model = copt::model()
+        copt::modelSetDblParam(model, 'TimeLimit', 1.5)
+        timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+        assert 1, timelimit == 1.5
+
+        copt::modelSetDblParam(model, 'TimeLimit', 33.3)
+        timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+        assert 2, timelimit == 33.3
+
+        copt::modelSetDblParam(model, 'TimeLimit', 50)
+        timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+        assert 3, timelimit == 50
+
+        copt::modelSetDblParam(model, 'TimeLimit', 36000)
+        timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+        assert 4, timelimit == 36000
+
+        copt::modelSetDblParam(model, 'TimeLimit', 2321)
+        timelimit = copt::modelGetDblParam(model, 'TimeLimit')
+        assert 5, timelimit == 2321
+	}
+}
+
+arr = array(STRING, 0, 10)
+for(i in 1..10){
+	arr.append!(submitJob("job"+string(i), "", test_copt_process))
+}
+
+for (jobName in arr){
+	getJobReturn(jobName, true)
+}
+
+re = exec errorMsg from getRecentJobs() where jobId in arr
+assert 6, re == take("", 10)
+
+
+@testing:case="test_multi_threads_addVars_varsSetAttr_varsGetAttr_multi_time"
+def test_copt_process(){
+	for(i in 1..30){
+		model = copt::model()
+		lb = 0 0 0 0 0 0 0 0 0 0
+        ub = 1 1 1 1 1 1 1 1 1 1
+        obj = 1 2 1 1 1 1 1 1 1 1
+        integer_type = 'I' 'I' 'I' 'I' 'I' 'I' 'I' 'I' 'I' 'I'
+
+        continues_vars = copt::addVars(model, 10, lb, ub, obj, )
+        integer_vars = copt::addVars(model, 10, lb, ub, obj, integer_type)
+        assert 1, continues_vars[0] == 'C_0'
+        assert 2, copt::varsGetAttr(model, continues_vars[0], 'LB') == 0
+
+        copt::varsSetAttr(model, continues_vars[0], 'UB', 1.5)
+        copt::varsSetAttr(model, continues_vars[1], 'UB', 0.5)
+        assert 3, copt::varsGetAttr(model, continues_vars[0:2], 'UB') == [1.5,0.5]
+
+        copt::varsSetAttr(model, integer_vars[0:5], 'UB', 3 4 5 6 7)
+        assert 4, copt::varsGetAttr(model, integer_vars, 'UB') == [3,4,5,6,7,1,1,1,1,1]
+
+        copt::varsSetAttr(model, integer_vars, 'obj', 2 3 1 2 2 2 9 12 2 99)
+        assert 5, copt::varsGetAttr(model, integer_vars, 'obj') == [2,3,1,2,2,2,9,12,2,99]
+
+	}
+}
+
+arr = array(STRING, 0, 10)
+for(i in 1..10){
+	arr.append!(submitJob("job"+string(i), "", test_copt_process))
+}
+
+for (jobName in arr){
+	getJobReturn(jobName, true)
+}
+
+re = exec errorMsg from getRecentJobs() where jobId in arr
+assert 6, re == take("", 10)
+
+
+@testing:case="test_multi_threads_setObjective_getObjValue_getResult_multi_time"
+def test_copt_process(){
+	for(i in 1..30){
+		model = copt::model()
+
+        old_var_num = copt::modelGetIntAttr(model, 'Cols')
+
+        lb = 0 0 0 0 0 0 0 0 0 0
+        ub = 1 1 1 1 1 1 1 1 1 1
+
+        stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
+        new_var_num = copt::modelGetIntAttr(model, 'Cols')
+
+        assert 1, old_var_num == 0
+        assert 2, new_var_num == 10
+
+        A = [1 1 1 0 0 0 0 0 0 0,
+             0 0 0 1 1 1 0 0 0 0,
+             0 0 0 0 0 0 1 1 1 1,
+             -1 -1 -1 0 0 0 0 0 0 0,
+             0 0 0 -1 -1 -1 0 0 0 0,
+             0 0 0 0 0 0 -1 -1 -1 -1]
+        rhs = 0.38 0.48 0.38 -0.22 -0.32 -0.22
+
+        for (i in 0:6) {
+        	lhsExpr = copt::linExpr(model, A[i], stock_vars)
+        	copt::addConstr(model, lhsExpr, '<', rhs[i])
+        }
+
+        lhsExpr = copt::linExpr(model, 1 1 1 1 1 1 1 1 1 1, stock_vars)
+        copt::addConstr(model, lhsExpr, '=', 1)
+
+        coefficients = 0.1 0.02 0.01 0.05 0.17 0.01 0.07 0.08 0.09 0.10
+        linExpr = copt::linExpr(model, coefficients, stock_vars)
+
+        H = [-1 0 0 0 0 0 0 0 0 0,
+             0 -1 0 0 0 0 0 0 0 0,
+             0 0 -1 0 0 0 0 0 0 0,
+             0 0 0 -1 0 0 0 0 0 0,
+             0 0 0 0 -1 0 0 0 0 0,
+             0 0 0 0 0 -1 0 0 0 0,
+             0 0 0 0 0 0 -1 0 0 0,
+             0 0 0 0 0 0 0 -1 0 0,
+             0 0 0 0 0 0 0 0 -1 0,
+             0 0 0 0 0 0 0 0 0 -1]
+        quadExpr = copt::quadExpr(model, matrix(H), stock_vars, linExpr)
+
+        copt::setObjective(model, quadExpr, -1)
+
+        status = copt::solve(model)
+
+        obj_value = copt::getObjValue(model)
+        obj_value_2 = copt::modelGetDblAttr(model, 'LpObjval')
+
+        assert 3, round(obj_value, 4) == -0.0254
+        assert 4, round(obj_value_2, 4) == -0.0254
+
+        results = copt::getResult(model)
+
+        assert 5, round(results['stock_0'], 4) == 0.1233
+        assert 6, round(results['stock_1'], 4) == 0.0833
+        assert 7, round(results['stock_2'], 4) == 0.0783
+        assert 8, round(results['stock_3'], 4) == 0.0983
+        assert 9, round(results['stock_4'], 4) == 0.1583
+        assert 10, round(results['stock_5'], 4) == 0.0783
+        assert 11, round(results['stock_6'], 4) == 0.0875
+        assert 12, round(results['stock_7'], 4) == 0.0925
+        assert 13, round(results['stock_8'], 4) == 0.0975
+        assert 14, round(results['stock_9'], 4) == 0.1025
+
+        copt::setObjective(model, quadExpr, 1)
+        status = copt::solve(model)
+        obj_value_minimize = copt::getObjValue(model)
+
+        assert 15, round(obj_value_minimize, 4) == -0.3456
+
+        results_minimize = copt::getResult(model)
+
+        assert 16, round(results_minimize['stock_0'], 4) == 0
+        assert 17, round(results_minimize['stock_1'], 4) == 0
+        assert 18, round(results_minimize['stock_2'], 4) == 0.3
+        assert 19, round(results_minimize['stock_3'], 4) == 0
+        assert 20, round(results_minimize['stock_4'], 4) == 0
+        assert 21, round(results_minimize['stock_5'], 4) == 0.48
+        assert 22, round(results_minimize['stock_6'], 4) == 0.22
+        assert 23, round(results_minimize['stock_7'], 4) == 0
+        assert 24, round(results_minimize['stock_8'], 4) == 0
+        assert 25, round(results_minimize['stock_9'], 4) == 0
+	}
+}
+
+arr = array(STRING, 0, 10)
+for(i in 1..10){
+	arr.append!(submitJob("job"+string(i), "", test_copt_process))
+}
+
+for (jobName in arr){
+	getJobReturn(jobName, true)
+}
+
+re = exec errorMsg from getRecentJobs() where jobId in arr
+assert 26, re == take("", 10)
