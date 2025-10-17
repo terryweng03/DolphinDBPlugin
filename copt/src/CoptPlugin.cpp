@@ -547,6 +547,7 @@ ConstantSP coptSetObjective(Heap *heap, vector<ConstantSP> &args) {
         if (isQuad) {
             model->SetQuadObjective(*COPT_QUAD_EXPRESSION_AMP.safeGet(expr), sense);
         } else {
+			model->DelQuadObj();
             model->SetObjective(*COPT_LINEAR_EXPRESSION_AMP.safeGet(expr), sense);
         }
     } catch (CoptException &e) {
