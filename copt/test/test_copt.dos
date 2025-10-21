@@ -429,6 +429,47 @@ assert 2, copt::modelGetIntAttr(model_diff_type, 'Ints') == 2
 assert 3, copt::modelGetIntAttr(model_diff_type, 'Bins') == 6
 
 
+@testing:case="test_addVars_bigarray"
+model_bigarray = copt::model()
+
+lb_bigarray = bigarray(INT, 2000, 10000000, 0)
+ub_bigarray = bigarray(INT, 2000, 10000000, 1)
+obj_bigarray = bigarray(DOUBLE, 2000, 10000000, 1)
+type_bigarray = bigarray(CHAR, 2000, 10000000, 'C')
+
+continues_vars_bigarray = copt::addVars(model_bigarray, 2000, lb_bigarray, ub_bigarray, obj_bigarray , type_bigarray,)
+
+assert 1, copt::modelGetIntAttr(model_bigarray, 'Cols') == 2000
+
+
+@testing:case="test_addVars_subarray"
+model_subarray = copt::model()
+
+lb_subarray = subarray(lb_bigarray, 10:200)
+ub_subarray = subarray(ub_bigarray, 10:200)
+obj_subarray = subarray(obj_bigarray, 10:200)
+type_subarray = subarray(type_bigarray, 10:200)
+
+continues_vars_subarray = copt::addVars(model_subarray, 190, lb_subarray, ub_subarray, obj_subarray , type_subarray,)
+
+assert 1, copt::modelGetIntAttr(model_subarray, 'Cols') == 190
+
+
+@testing:case="test_getVarAttr_and_setVarAttr_bigarray"
+assert 1, copt::varsGetAttr(model_bigarray, continues_vars_bigarray, 'UB') == array(INT, 2000, 10000000, 1)
+
+copt::varsSetAttr(model_bigarray, continues_vars_bigarray, 'UB', bigarray(INT, 2000, 10000000, 2))
+assert 2, copt::varsGetAttr(model_bigarray, continues_vars_bigarray, 'UB') == array(INT, 2000, 10000000, 2)
+
+
+@testing:case="test_getVarAttr_and_setVarAttr_subarray"
+assert 1, copt::varsGetAttr(model_subarray, continues_vars_subarray, 'LB') == array(INT, 190, 10000000, 0)
+
+copt::varsSetAttr(model_subarray, continues_vars_subarray, 'LB', bigarray(DOUBLE, 190, 10000000, 0.5))
+assert 2, copt::varsGetAttr(model_subarray, continues_vars_subarray, 'LB') == array(DOUBLE, 190, 10000000, 0.5)
+
+
+
 @testing:case="test_addVars_wrong_param_format_1", exception=1
 tmp = copt::addVars(model, '3', , , , )
 
@@ -643,6 +684,32 @@ lhsExpr = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars)
 lhsExpr_with_constant = copt::linExpr(model, -1 0 0 0 0 0 0 0 0 0, stock_vars, 2)
 
 
+@testing:case="test_LinExpr_bigarray"
+model_bigarray = copt::model()
+
+lb_bigarray = bigarray(INT, 2000, 10000000, 0)
+ub_bigarray = bigarray(INT, 2000, 10000000, 1)
+obj_bigarray = bigarray(DOUBLE, 2000, 10000000, 1)
+type_bigarray = bigarray(CHAR, 2000, 10000000, 'C')
+
+continues_vars_bigarray = copt::addVars(model_bigarray, 2000, lb_bigarray, ub_bigarray, obj_bigarray , type_bigarray,)
+
+lhsExpr_bigarray = copt::linExpr(model_bigarray, bigarray(DOUBLE, 2000, 10000000, 1.5), continues_vars_bigarray)
+
+
+@testing:case="test_LinExpr_subarray"
+model_subarray = copt::model()
+
+lb_subarray = subarray(lb_bigarray, 10:200)
+ub_subarray = subarray(ub_bigarray, 10:200)
+obj_subarray = subarray(obj_bigarray, 10:200)
+type_subarray = subarray(type_bigarray, 10:200)
+
+continues_vars_subarray = copt::addVars(model_subarray, 190, lb_subarray, ub_subarray, obj_subarray , type_subarray,)
+
+linExpr_subarray = copt::linExpr(model_subarray, array(DOUBLE, 190, 10000000, 1.5), continues_vars_subarray)
+
+
 @testing:case="test_LinExpr_wrong_param_format_1", exception=1
 tmp = copt::linExpr(model, -1, stock_vars)
 
@@ -744,6 +811,63 @@ quadExpr = copt::quadExpr(model, matrix(H), stock_vars)
 
 @testing:case="test_QuadExpr_2"
 quadExpr = copt::quadExpr(model, matrix(H), stock_vars, , 2)
+
+
+@testing:case="test_QuadExpr_bigarray"
+model_bigarray = copt::model()
+
+lb_bigarray = bigarray(INT, 1024, 10000000, 0)
+ub_bigarray = bigarray(INT, 1024, 10000000, 1)
+obj_bigarray = bigarray(DOUBLE, 1024, 10000000, 1)
+type_bigarray = bigarray(CHAR, 1024, 10000000, 'C')
+
+H_bigarray = matrix(INT, 1024, 1024)
+for (i in 0:1024) {
+    H_bigarray[i, i] = 1
+}
+
+
+continues_vars_bigarray = copt::addVars(model_bigarray, 1024, lb_bigarray, ub_bigarray, obj_bigarray , type_bigarray,)
+
+quadExpr_bigarray = copt::quadExpr(model_bigarray, H_bigarray, continues_vars_bigarray, ,)
+
+
+@testing:case="test_QuadExpr_subarray"
+model_subarray = copt::model()
+
+lb_subarray = subarray(lb_bigarray, 10:200)
+ub_subarray = subarray(ub_bigarray, 10:200)
+obj_subarray = subarray(obj_bigarray, 10:200)
+type_subarray = subarray(type_bigarray, 10:200)
+
+H_subarray = matrix(INT, 190, 190)
+for (i in 0:190) {
+    H_subarray[i, i] = 1
+}
+
+continues_vars_subarray = copt::addVars(model_subarray, 190, lb_subarray, ub_subarray, obj_subarray , type_subarray,)
+
+quadExpr_subarray = copt::quadExpr(model_subarray, H_subarray, continues_vars_subarray, ,)
+
+
+@testing:case="test_QuadExpr_matrix_loc"
+model_matrix_loc = copt::model()
+
+lb_matrix_loc = bigarray(INT, 1400, 10000000, 0)
+ub_matrix_loc = bigarray(INT, 1400, 10000000, 1)
+obj_matrix_loc = bigarray(DOUBLE, 1400, 10000000, 1)
+type_matrix_loc = bigarray(CHAR, 1400, 10000000, 'C')
+
+m = rand(2000*2000, 2000:2000)
+filter = array(BOOL, 2000, 0)
+for (i in 0:1400) {
+    filter[i] = true
+}
+H_matrix_loc = m.loc(filter, filter, view=true)
+
+continues_vars_matrix_loc = copt::addVars(model_matrix_loc, 1400, lb_matrix_loc, ub_matrix_loc, obj_matrix_loc , type_matrix_loc,)
+
+quadExpr_matrix_loc = copt::quadExpr(model_matrix_loc, H_matrix_loc, continues_vars_matrix_loc, ,)
 
 
 @testing:case="test_QuadExpr_wrong_param_format_1", exception=1
@@ -1096,6 +1220,11 @@ copt::setLogFile(NULL, './copt_test.log')
 copt::setLogFile([model], './copt_test.log')
 
 
+// COPT will give a warning "Failed to open './wrong_path/copt_test.log' for logging", but no exception
+@testing:case="test_setLogFile_wrong_path"
+copt::setLogFile(model, './wrong_path_copt_test.log')
+
+
 @testing:case="test_setObjective_wrong_param_format_1", exception=1
 copt::setObjective(model, stock_vars, -1)
 
@@ -1260,8 +1389,8 @@ assert 1, re == take("", 10)
 
 @testing:case="test_multi_threads_modelSetIntParam_and_modelSetIntParam_multi_time"
 def test_copt_process(){
+	model = copt::model()
 	for(i in 1..30){
-		model = copt::model()
         copt::modelSetIntParam(model, 'lpmethod', 2)
         lpmethod = copt::modelGetIntParam(model, 'lpmethod')
         assert 1, lpmethod == 2
@@ -1293,46 +1422,10 @@ re = exec errorMsg from getRecentJobs() where jobId in arr
 assert 5, re == take("", 10)
 
 
-@testing:case="test_multi_threads_modelSetIntParam_and_modelSetIntParam_multi_time_one_model"
-model = copt::model()
-
-def test_copt_process(model){
-	for(i in 1..30){
-        copt::modelSetIntParam(model, 'lpmethod', 2)
-        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
-        assert 1, lpmethod == 2
-
-        copt::modelSetIntParam(model, 'lpmethod', 3)
-        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
-        assert 2, lpmethod == 3
-
-        copt::modelSetIntParam(model, 'lpmethod', -1)
-        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
-        assert 3, lpmethod == -1
-
-        copt::modelSetIntParam(model, 'lpmethod', 6)
-        lpmethod = copt::modelGetIntParam(model, 'lpmethod')
-        assert 4, lpmethod == 6
-	}
-}
-
-arr = array(STRING, 0, 10)
-for(i in 1..10){
-	arr.append!(submitJob("job"+string(i), "", test_copt_process, model)
-}
-
-for (jobName in arr){
-	getJobReturn(jobName, true)
-}
-
-re = exec errorMsg from getRecentJobs() where jobId in arr
-assert 5, re == take("", 10)
-
-
 @testing:case="test_multi_threads_modelSetIntParam_and_modelSetIntParam_multi_time"
 def test_copt_process(){
+	model = copt::model()
 	for(i in 1..30){
-		model = copt::model()
         copt::modelSetDblParam(model, 'TimeLimit', 1.5)
         timelimit = copt::modelGetDblParam(model, 'TimeLimit')
         assert 1, timelimit == 1.5
@@ -1510,3 +1603,30 @@ for (jobName in arr){
 
 re = exec errorMsg from getRecentJobs() where jobId in arr
 assert 26, re == take("", 10)
+
+
+@testing:case="test_multi_threads_modelRead_and_modelWrite_multi_time"
+def test_copt_process(pid){
+	model = copt::model()
+    lb = 0 0 0 0 0 0 0 0 0 0
+    ub = 1 1 1 1 1 1 1 1 1 1
+    stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
+
+	for(i in 1..30){
+        copt::modelWrite(model, "./tmp_" + string(pid) + ".mps")
+        copt::modelRead(model, "./tmp_" + string(pid) + ".mps")
+	}
+}
+
+arr = array(STRING, 0, 10)
+for(i in 1..10){
+	arr.append!(submitJob("job"+string(i), "", test_copt_process, i))
+}
+
+for (jobName in arr){
+	getJobReturn(jobName, true)
+}
+
+re = exec errorMsg from getRecentJobs() where jobId in arr
+assert 1, re == take("", 10)
+
