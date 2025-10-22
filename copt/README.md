@@ -1,6 +1,6 @@
 # DolphinDB copt 插件使用说明
-杉数求解器 copt 是杉数自主研发的针对大规模优化问题的高效数学规划求解器套件。\
-杉数求解器目前支持求解线性规划、二阶锥规划、二次规划、 二次约束规划、指数锥规划、半定规划、非线性规划、 混合整数线性规划、混合整数二阶锥规划、混合整数凸二次规划以及混合整数凸二次约束规划问题，为企业应对高性能求解的需求提供了更多选择。\
+杉数求解器 copt 是杉数自主研发的针对大规模优化问题的高效数学规划求解器套件。  
+杉数求解器目前支持求解线性规划、二阶锥规划、二次规划、 二次约束规划、指数锥规划、半定规划、非线性规划、 混合整数线性规划、混合整数二阶锥规划、混合整数凸二次规划以及混合整数凸二次约束规划问题，为企业应对高性能求解的需求提供了更多选择。  
 用户可于杉数科技官网进行 copt 的[试用申请](https://shanshu.ai/copt)。
 ## 在插件市场安装插件
 
@@ -37,9 +37,8 @@ loadPlugin("copt")
 
 **详情**
 
-建立一个 COPT 模型对象。\
-注意：COPT 模型对象默认设置参数 [LogToConsole](https://guide.coap.online/copt/zh-doc/parameter.html#chapparam-other) 
-为 0, 若需要打印求解日志，可以通过函数 `modelSetIntParam(model, "logToConsole", 1)` 设置 LogToConSole 为 1 使求解日志输出到控制台，或者通过函数 `setLogFile(model, logFilePath)` 保存求解日志到文件中。
+建立一个 COPT 模型对象。COPT 模型对象默认设置参数 [LogToConsole](https://guide.coap.online/copt/zh-doc/parameter.html#chapparam-other)
+为 0, 若需要打印求解日志，可以通过函数 `modelSetIntParam(model, "logToConsole", 1)` 将 LogToConSole 设置为 1 使求解日志输出到控制台，或者通过函数 `setLogFile(model, logFilePath)` 保存求解日志到文件中。
 
 **返回值**
 
@@ -57,7 +56,7 @@ model = copt::model()
 
 **详情**
 
-从文件中读取问题，解，基，MIP start 或者 COPT 参数，请参考 COPT 文档的 [文件格式](https://guide.coap.online/copt/zh-doc/fileformats.html)。\
+从文件中读取问题，解，基，MIP start 或者 COPT 参数，请参考 COPT 文档的 [文件格式](https://guide.coap.online/copt/zh-doc/fileformats.html)。  
 注意：对同一 COPT 模型对象上同时执行 `modelRead(model, filePath)` 和 `modelWrite(model, filePath)` 可能导致程序崩溃，请避免并发读写操作。
 
 **参数**
@@ -81,8 +80,8 @@ copt::modelRead(model, "lp_ex1.mps") // 从 lp_ex1.mps 读取问题
 
 **详情**
 
-将问题，解，基，MIP start 或者更改后的 COPT 参数输出到文件中，请参考 COPT 文档的 [文件格式](https://guide.coap.online/copt/zh-doc/fileformats. \
-注意：对同一 COPT 模型对象上同时执行 `modelRead(model, filePath)` 和 `modelWrite(model, filePath)` 可能导致程序崩溃，请避免并发读写操作。html)。
+将问题，解，基，MIP start 或者更改后的 COPT 参数输出到文件中，请参考 COPT 文档的 [文件格式](https://guide.coap.online/copt/zh-doc/fileformats)。  
+注意：对同一 COPT 模型对象上同时执行 `modelRead(model, filePath)` 和 `modelWrite(model, filePath)` 可能导致程序崩溃，请避免并发读写操作。
 
 **参数**
 
