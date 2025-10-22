@@ -60,7 +60,7 @@ ConstantSP coptModel(Heap *heap) {
         Envr env;
         Model coptModel = env.CreateModel("COPT model");
         model = new Model(coptModel);
-		model->GetIntParam("LogToConsole", 0);
+		model->SetIntParam("LogToConsole", 0);
     } catch (CoptException &e) {
         throw RuntimeException(COPT_PREFIX + " Error code = " + std::to_string(e.GetCode()) + "\n" + e.what()   );
     }
