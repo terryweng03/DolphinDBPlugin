@@ -1630,3 +1630,49 @@ for (jobName in arr){
 re = exec errorMsg from getRecentJobs() where jobId in arr
 assert 1, re == take("", 10)
 
+
+@testing:case="test_set_logToConsole_to_1"
+model = copt::model()
+copt::modelSetIntParam(model, "logToConsole", 1)
+
+lb = 0 0 0 0 0 0 0 0 0 0
+ub = 1 1 1 1 1 1 1 1 1 1
+
+stock_vars = copt::addVars(model, 10, lb, ub, , , 'stock')
+new_var_num = copt::modelGetIntAttr(model, 'Cols')
+
+A = [1 1 1 0 0 0 0 0 0 0,
+    0 0 0 1 1 1 0 0 0 0,
+    0 0 0 0 0 0 1 1 1 1,
+    -1 -1 -1 0 0 0 0 0 0 0,
+    0 0 0 -1 -1 -1 0 0 0 0,
+    0 0 0 0 0 0 -1 -1 -1 -1]
+rhs = 0.38 0.48 0.38 -0.22 -0.32 -0.22
+
+for (i in 0:6) {
+    lhsExpr = copt::linExpr(model, A[i], stock_vars)
+    copt::addConstr(model, lhsExpr, '<', rhs[i])
+}
+
+lhsExpr = copt::linExpr(model, 1 1 1 1 1 1 1 1 1 1, stock_vars)
+copt::addConstr(model, lhsExpr, '=', 1)
+
+coefficients = 0.1 0.02 0.01 0.05 0.17 0.01 0.07 0.08 0.09 0.10
+linExpr = copt::linExpr(model, coefficients, stock_vars)
+
+H = [-1 0 0 0 0 0 0 0 0 0,
+    0 -1 0 0 0 0 0 0 0 0,
+    0 0 -1 0 0 0 0 0 0 0,
+    0 0 0 -1 0 0 0 0 0 0,
+    0 0 0 0 -1 0 0 0 0 0,
+    0 0 0 0 0 -1 0 0 0 0,
+    0 0 0 0 0 0 -1 0 0 0,
+    0 0 0 0 0 0 0 -1 0 0,
+    0 0 0 0 0 0 0 0 -1 0,
+    0 0 0 0 0 0 0 0 0 -1]
+quadExpr = copt::quadExpr(model, matrix(H), stock_vars, linExpr)
+
+copt::setObjective(model, quadExpr, -1)
+
+status = copt::solve(model)
+
