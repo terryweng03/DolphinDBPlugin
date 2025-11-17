@@ -171,8 +171,22 @@ $$
 objValue = copt::getObjValue(model)
 print(objValue)
 ```
+获取模型目标函数值并打印，该示例的目标函数值为 -0.025441666666667
 
 ```DolphinDB
 results = copt::getResult(model)
 print(results)
+```
+获取模型中的变量取值并打印，该示例的变量取值字典为
+```DolphinDB
+stock_0->0.123333333331732
+stock_1->0.083333333331732
+stock_2->0.078333333331732
+stock_3->0.098333333334935
+stock_4->0.158333333334934
+stock_5->0.078333333334936
+stock_6->0.0875
+stock_7->0.0925
+stock_8->0.0975
+stock_9->0.1025
 ```
